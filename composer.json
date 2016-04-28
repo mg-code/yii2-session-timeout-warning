@@ -1,0 +1,23 @@
+{
+    "name": "mg-code/yii2-session-timeout-warning",
+    "description": "Popup warning appears before user session expires.",
+    "keywords": ["yii2", "extension", "user", "session", "timeout", "expire", "warning", "notification"],
+    "homepage": "https://github.com/mg-code/yii2-session-timeout-warning",
+    "type": "yii2-extension",
+    "license": "BSD 3-Clause",
+    "authors": [
+        {
+            "name": "Maris Graudins",
+            "role": "Developer"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "yiisoft/yii2": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "mgcode\\sessionWarning\\": ""
+        }
+    }
+}
