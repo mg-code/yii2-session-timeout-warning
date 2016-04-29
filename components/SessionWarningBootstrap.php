@@ -17,16 +17,22 @@ class SessionWarningBootstrap extends Object implements BootstrapInterface
     const COOKIE_USER = 'session_warning_user_id';
     const COOKIE_TIMEOUT = 'session_warning_time';
 
+    public $initMessages = false;
+
     /** @inheritdoc */
     public function bootstrap($app)
     {
         $app->on(Application::EVENT_AFTER_REQUEST, [$this, 'setTimeoutCookie']);
-//        $app = \Yii::$app->i18n;
-//        $app->translations['mgcode/user'] = [
-//            'class' => 'yii\i18n\PhpMessageSource',
-//            'sourceLanguage' => 'en-US',
-//            'basePath' => '@mgcode/user/common/messages',
-//        ];
+        if($this->initMessages) {
+            $app = \Yii::$app->i18n;
+            if (!array_key_exists('mgcode/sessionWarning', $app->translations)) {
+                $app->translations['mgcode/sessionWarning'] = [
+                    'class' => 'yii\i18n\PhpMessageSource',
+                    'sourceLanguage' => 'en-US',
+                    'basePath' => '@mgcode/sessionWarning/messages',
+                ];
+            }
+        }
     }
 
     /**
@@ -40,7 +46,7 @@ class SessionWarningBootstrap extends Object implements BootstrapInterface
         $application = $event->sender;
         $user = $application->user;
 
-        if(!$user || !$user->getIdentity()) {
+        if (!$user || !$user->getIdentity()) {
             return $this->setCookie(null, null);
         }
 
