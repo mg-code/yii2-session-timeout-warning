@@ -1,6 +1,6 @@
 {
     "name": "mg-code/yii2-session-timeout-warning",
-    "description": "Popup warning appears before user session expires.",
+    "description": "Users are warned about expiring session.",
     "keywords": ["yii2", "extension", "user", "session", "timeout", "expire", "warning", "notification"],
     "homepage": "https://github.com/mg-code/yii2-session-timeout-warning",
     "type": "yii2-extension",
