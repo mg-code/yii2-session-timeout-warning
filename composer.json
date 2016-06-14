@@ -17,7 +17,7 @@
         "yiisoft/yii2-bootstrap": "*",
         "mg-code/yii2-helpers": "*",
         "bower-asset/js-cookie": "~2",
-        "mg-code/assets": "*"
+        "mg-code/yii2-assets": "*"
     },
     "autoload": {
         "psr-4": {
