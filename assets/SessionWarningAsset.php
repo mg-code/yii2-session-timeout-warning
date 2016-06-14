@@ -21,7 +21,7 @@ class SessionWarningAsset extends AssetBundle
         'yii\web\JqueryAsset',
         'mgcode\helpers\HelpersAsset',
         'yii\bootstrap\BootstrapPluginAsset',
-        'mgcode\jsCookie\JsCookieAsset',
+        'mgcode\assets\JsCookieAsset',
     ];
 
     /**
