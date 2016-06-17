@@ -14,8 +14,9 @@ use yii\web\Application;
  */
 class SessionWarningBootstrap extends Object implements BootstrapInterface
 {
-    const COOKIE_USER = 'session_warning_user_id';
-    const COOKIE_TIMEOUT = 'session_warning_time';
+    const COOKIE_USER = '__swuid';
+    const COOKIE_TIMEOUT = '__swto';
+    const COOKIE_TIMEOUT_ABSOLUTE = '__swato';
 
     public $initMessages = false;
 
@@ -23,7 +24,7 @@ class SessionWarningBootstrap extends Object implements BootstrapInterface
     public function bootstrap($app)
     {
         $app->on(Application::EVENT_AFTER_REQUEST, [$this, 'setTimeoutCookie']);
-        if($this->initMessages) {
+        if ($this->initMessages) {
             $app = \Yii::$app->i18n;
             if (!array_key_exists('mgcode/sessionWarning', $app->translations)) {
                 $app->translations['mgcode/sessionWarning'] = [
@@ -47,29 +48,55 @@ class SessionWarningBootstrap extends Object implements BootstrapInterface
         $user = $application->user;
 
         if (!$user || !$user->getIdentity()) {
-            return $this->setCookie(null, null);
+            return $this->clearCookies();
         }
 
         $session = Yii::$app->session;
-        $authTimeout = $session->get($user->authTimeoutParam);
-        $timeout = $authTimeout ? $authTimeout : time() + $session->getTimeout();
 
-        return $this->setCookie($user->id, $timeout);
+        // Default session timeout
+        $timeout = time() + $session->getTimeout();
+
+        // If auth timeout is closer than default timeout
+        $authTimeout = $session->get($user->authTimeoutParam);
+        if ($authTimeout && $authTimeout < $timeout) {
+            $timeout = $authTimeout;
+        }
+
+        // Absolute timeout
+        $absoluteTimeout = $session->get($user->absoluteAuthTimeoutParam);
+
+        return $this->setCookie($user->id, $timeout, $absoluteTimeout);
     }
 
     /**
-     * Sets cookie
-     * @param $userId
-     * @param $timeout
+     * Clears cookies
+     */
+    protected function clearCookies()
+    {
+        $time = time() - 60;
+        setcookie(static::COOKIE_USER, null, $time, '/');
+        setcookie(static::COOKIE_TIMEOUT, null, $time, '/');
+        setcookie(static::COOKIE_TIMEOUT_ABSOLUTE, null, $time, '/');
+    }
+
+    /**
+     * Sets session cookie
+     * @param int|string $userId
+     * @param int $timeout
+     * @param int $absoluteTimeout
      * @return bool
      */
-    protected function setCookie($userId, $timeout)
+    protected function setCookie($userId, $timeout, $absoluteTimeout)
     {
-        $expire = $timeout ? $timeout : time() - 10;
-
         // We are using native functions, because we don't want to encrypt cookies. Cookies should be readable from JS.
-        setcookie(static::COOKIE_USER, $userId, $expire, '/');
-        setcookie(static::COOKIE_TIMEOUT, $timeout, $expire, '/');
+        setcookie(static::COOKIE_USER, $userId, $timeout + 60, '/');
+        setcookie(static::COOKIE_TIMEOUT, $timeout, $timeout + 60, '/');
+
+        if ($absoluteTimeout) {
+            setcookie(static::COOKIE_TIMEOUT_ABSOLUTE, $absoluteTimeout, $absoluteTimeout + 60, '/');
+        } else {
+            setcookie(static::COOKIE_TIMEOUT_ABSOLUTE, null, time() - 60, '/');
+        }
 
         return true;
     }

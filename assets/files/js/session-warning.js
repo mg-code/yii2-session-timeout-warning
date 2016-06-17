@@ -11,8 +11,9 @@
     };
 
     var defaultSettings = {
-        cookieUser: 'session_warning_user_id',
-        cookieTimeout: 'session_warning_time',
+        cookieUser: '__swuid',
+        cookieTimeout: '__swto',
+        cookieTimeoutAbsolute: '__swato',
         extendUrl: null,
         userId: null,
         warnBefore: null,
@@ -28,10 +29,10 @@
                 settings = $.extend({}, defaultSettings, $e.data(), options || {});
                 settings.warnBefore = parseInt(settings.warnBefore);
 
-                // Check every 5 seconds
+                // Check every 3 seconds
                 setInterval(function () {
                     methods._watch.apply($e);
-                }, 1000);
+                }, 3000);
 
                 methods._onContinueClick.apply($e);
             });
@@ -65,23 +66,53 @@
         },
 
         /**
+         * Logs out user
+         * @private
+         */
+        _logout: function() {
+            if(settings.logoutUrl) {
+                window.location = settings.logoutUrl;
+            } else {
+                location.reload();
+            }
+        },
+
+        /**
          * Checks and shows warning if needed.
          * @private
          */
         _watch: function () {
             var $e = $(this),
                 userId = Cookies.get(settings.cookieUser),
-                timeout = Cookies.get(settings.cookieTimeout);
+                timeout = Cookies.get(settings.cookieTimeout),
+                absoluteTimeout = Cookies.get(settings.cookieTimeoutAbsolute);
+
+            timeout = timeout ? parseInt(timeout) : null;
+            absoluteTimeout = absoluteTimeout ? parseInt(absoluteTimeout) : null;
 
             // Checks whether user is logged in.
             if (!userId || !timeout || userId != settings.userId) {
-                location.reload();
+                methods._logout.apply($e);
                 return;
             }
 
-            timeout = parseInt(timeout);
-            var timestamp = mgcode.helpers.time.getTimestamp(),
-                difference = timeout - timestamp;
+            // Current timestamp
+            var timestamp = mgcode.helpers.time.getTimestamp();
+
+            // Absolute timeout reached
+            if(absoluteTimeout && (absoluteTimeout - timestamp) < 0) {
+                methods._logout.apply($e);
+                return;
+            }
+
+            // Timeout reached
+            if(timeout && (timeout - timestamp) < 0) {
+                methods._logout.apply($e);
+                return;
+            }
+
+            // Calculate timestamp difference
+            var difference = timeout - timestamp;
 
             // If modal is opened, close it.
             if (settings.warnBefore < difference) {

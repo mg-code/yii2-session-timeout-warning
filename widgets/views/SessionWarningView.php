@@ -26,4 +26,6 @@ use yii\helpers\Url;
 
 <?php
 \mgcode\sessionWarning\assets\SessionWarningAsset::register($this)
-    ->initPlugin($this);
+    ->initPlugin($this, [
+        'logoutUrl' => $logoutUrl,
+    ]);
