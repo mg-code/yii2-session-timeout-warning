@@ -35,7 +35,7 @@ to the ```require``` section of your `composer.json` file.
   'bootstrap' => [
       [
           'class' => \mgcode\sessionWarning\components\SessionWarningBootstrap::className(),
-          'initMesscompoages' => true,
+          'initMessages' => true,
       ]
   ],
 ];
