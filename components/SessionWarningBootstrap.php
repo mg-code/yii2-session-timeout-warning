@@ -23,7 +23,9 @@ class SessionWarningBootstrap extends Object implements BootstrapInterface
     /** @inheritdoc */
     public function bootstrap($app)
     {
-        $app->on(Application::EVENT_AFTER_REQUEST, [$this, 'setTimeoutCookie']);
+        if(!$this->getIsPjaxRequest()) {
+            $app->on(Application::EVENT_AFTER_REQUEST, [$this, 'setTimeoutCookie']);
+        }
         if ($this->initMessages) {
             $app = \Yii::$app->i18n;
             if (!array_key_exists('mgcode/sessionWarning', $app->translations)) {
@@ -99,5 +101,14 @@ class SessionWarningBootstrap extends Object implements BootstrapInterface
         }
 
         return true;
+    }
+
+    /**
+     * @return boolean whether the current request requires pjax response
+     */
+    protected function getIsPjaxRequest()
+    {
+        $headers = Yii::$app->getRequest()->getHeaders();
+        return $headers->get('X-Pjax');
     }
 }
