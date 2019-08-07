@@ -3,16 +3,16 @@
 namespace mgcode\sessionWarning\components;
 
 use \Yii;
+use yii\base\BaseObject;
 use yii\base\BootstrapInterface;
 use yii\base\Event;
-use yii\base\Object;
 use yii\web\Application;
 
 /**
  * @link https://github.com/mg-code/yii2-session-timeout-warning
  * @author Maris Graudins <maris@mg-interactive.lv>
  */
-class SessionWarningBootstrap extends Object implements BootstrapInterface
+class SessionWarningBootstrap extends BaseObject implements BootstrapInterface
 {
     const COOKIE_USER = '__swuid';
     const COOKIE_TIMEOUT = '__swto';
